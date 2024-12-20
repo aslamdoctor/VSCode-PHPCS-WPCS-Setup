@@ -1,6 +1,6 @@
 # VSCode + PHPCS + WPCS Setup
 
-This repository is only used for setting up VSCode properly for WordPress projects so that the code can follow proper WordPress coding standards.
+This repository is only used for setting up VSCode properly for WordPress projects the uses [Understrap Theme](https://github.com/understrap/understrap). So that the code can follow proper WordPress coding standards.
 
 ## Required VSCode Extension
 

@@ -1,8 +1,14 @@
 {
   "[php]": {
-      "editor.defaultFormatter": "valeryanm.vscode-phpsab",
-      "editor.formatOnSave": true
+    "editor.formatOnSave": true
   },
-  "phpsab.executablePathCBF": "vendor/bin/phpcbf",
-  "phpsab.executablePathCS": "vendor/bin/phpcs",
+  "[css]": {
+    "editor.formatOnSave": true
+  },
+  "[scss]": {
+    "editor.formatOnSave": true
+  },
+  "[javascript]": {
+    "editor.formatOnSave": true
+  },
 }
