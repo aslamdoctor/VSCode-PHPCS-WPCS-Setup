@@ -1,30 +1,25 @@
 <?xml version="1.0"?>
-<ruleset name="WordPress Coding Standards">
-	<description>Apply WordPress Coding Standards</description>
+<ruleset name="Understrap Coding Standards">
 
-	<!-- Set the memory limit to 512M.
-		 For most standard PHP configurations, this means the memory limit will temporarily be raised.
-		 Ref: https://github.com/squizlabs/PHP_CodeSniffer/wiki/Advanced-Usage#specifying-phpini-settings
-	-->
-	<ini name="memory_limit" value="512M"/>
+	<description>Apply WordPress Coding Standards to Understrap</description>
 
 	<!-- Whenever possible, cache the scan results and re-use those for unchanged files on the next scan. -->
-	<arg name="cache"/>
+	<arg name="cache" value=".phpcs-cache.json"/>
 
-	<!-- Show sniff codes in all reports. -->
-	<arg value="ps"/>
+	<!-- Strip the filepaths down to the relevant bit. -->
+	<arg name="basepath" value="./"/>
 
-	<!-- WordPress Core currently supports PHP 8.2+. -->
-	<config name="testVersion" value="8.2-"/>
-	<rule ref="PHPCompatibilityWP">
-		<include-pattern>*\.php</include-pattern>
-	</rule>
+	<!-- Show colors in console -->
+	<arg name="colors"/>
 
-	<!-- Only sniff PHP files. -->
-	<arg name="extensions" value="php"/>
+	<!-- Show sniff codes in all reports -->
+	<arg value="s"/>
 
-	<!-- Only sniff the theme. -->
-	<file>./</file>
+	<!-- Check for cross-version support for PHP 5.2 and higher. -->
+	<config name="testVersion" value="5.2-"/>
+
+	<!-- Scan these files -->
+	<file>.</file>
 
 	<!-- Directories and third party library exclusions. -->
 	<exclude-pattern>/vendor/*</exclude-pattern>
@@ -38,25 +33,72 @@
 	<exclude-pattern>*.min.(js|css)</exclude-pattern>
 	<exclude-pattern>/\.*</exclude-pattern>
 
-	<!-- Strip the filepaths down to the relevant bit. -->
-	<arg name="basepath" value="."/>
-
-	<!-- Check up to 8 files simultaneously. -->
-	<arg name="parallel" value="8"/>
-
-	<!-- Use WordPress "Extra" Coding Standards. -->
-	<rule ref="WordPress-Extra">
-		<!-- Allow short prefixes. -->
-		<exclude name="WordPress.NamingConventions.PrefixAllGlobals.ShortPrefixPassed"/>
+	<!-- Use the WordPress Ruleset -->
+	<rule ref="WordPress">
+		<include-pattern>*\.php$</include-pattern>
 	</rule>
 
-	<!-- Use WordPress "Docs" Coding Standards. -->
-	<rule ref="WordPress-Docs" />
-
-	<!-- Use WordPress "VIP Go" Coding Standards for Security checks. -->
-	<rule ref="WordPress-VIP-Go">
-		<!-- Check for proper escaping of output. -->
-		<rule ref="WordPress.Security.EscapeOutput"/>
+	<!--
+		Verify that the text_domain is set to the desired text-domain.
+		Multiple valid text domains can be provided as a comma-delimited list.
+	-->
+	<rule ref="WordPress.WP.I18n">
+		<properties>
+			<property name="text_domain" type="array">
+				<element value="understrap"/>
+				<element value="woocommerce"/>
+			</property>
+		</properties>
 	</rule>
 
+	<!--
+		Allow for theme specific exceptions to the file name rules based
+		on the theme hierarchy.
+	-->
+	<rule ref="WordPress.Files.FileName">
+		<properties>
+			<property name="is_theme" value="true"/>
+		</properties>
+	</rule>
+
+	<!-- Exclude incorrectly named files that won't be renamed. -->
+	<rule ref="WordPress.Files.FileName.InvalidClassFileName">
+		<exclude-pattern>/inc/class-wp-bootstrap-navwalker\.php</exclude-pattern>
+	</rule>
+
+	<rule ref="WordPress.Security.EscapeOutput">
+		<!-- Exclude functions which are escaped in inc/extras.php -->
+		<properties>
+			<property name="customAutoEscapedFunctions" type="array">
+				<element value="get_the_title"/>
+				<element value="get_the_archive_title"/>
+				<element value="get_the_archive_description"/>
+				<element value="understrap_get_list_item_separator"/>
+				<element value="understrap_get_screen_reader_class"/>
+			</property>
+		</properties>
+	</rule>
+
+	<!--
+		Exclude checking of line endings when reporting errors, but fix them
+		when running phpcbf.
+	-->
+	<rule ref="Generic.Files.LineEndings">
+		<exclude phpcs-only="true" name="Generic.Files.LineEndings"/>
+	</rule>
+
+	<!-- Ignore mixed line-endings warnings -->
+	<rule ref="Internal.LineEndings.Mixed">
+		<severity>0</severity>
+	</rule>
+
+	<!--
+		Check for PHP cross-version compatibility.
+		This WordPress specific ruleset prevents false positives from the
+		PHPCompatibility standard by excluding back-fills and poly-fills
+		which are provided by WordPress.
+	-->
+	<rule ref="PHPCompatibilityWP">
+		<include-pattern>*\.php$</include-pattern>
+	</rule>
 </ruleset>
